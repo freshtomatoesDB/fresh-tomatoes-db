@@ -119,6 +119,26 @@ describe('all routes', () => {
     expect(response.body).toEqual({});
   });
 
+  it('gets a movie by id with the actors', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovie = moviesList[0];
+    
+
+    const response = await request(app)
+      .get(`/api/movieswithactors/${savedMovie.id}`);
+
+    expect(response.body).toEqual(
+      {
+        ...savedMovie,
+        actors: expect.arrayContaining([
+          { id: expect.any(Number), movieId: Number(savedMovie.id), name: 'Will Ferrell', oscar: true },
+          { id: expect.any(Number), movieId: Number(savedMovie.id), name: 'John C Reilly', oscar: true }
+        ])
+      }
+    );
+  });
+
+
   it('returns an updated movie after update', async() => {
     const moviesList = await Movie.findAllMovies();
     const savedMovieId = moviesList[0].id;
