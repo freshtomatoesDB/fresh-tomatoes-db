@@ -87,4 +87,35 @@ describe('all routes', () => {
       }
     ]));
   });
+
+  it('gets a movie by id', async() => {
+    const stepBrothersMovie = await Movie.insertMovie({
+      title: 'Step Brothers',
+      year: 2008,
+      director: 'Adam McKay',
+      genre: 'Heartfelt Comedy',
+      thumbs: true
+    });
+
+    const response = await request(app)
+      .get(`/api/movies/${stepBrothersMovie.id}`);
+
+    expect(response.body).toEqual(
+      {
+        id: expect.any(String),
+        title: 'Step Brothers',
+        year: 2008,
+        director: 'Adam McKay',
+        genre: 'Heartfelt Comedy',
+        thumbs: true
+      }
+    );
+  });
+
+  it('returns null if passed a bad id', async() => {
+    const response = await request(app)
+      .get('/api/movies/1234');
+
+    expect(response.body).toEqual({});
+  });
 });
