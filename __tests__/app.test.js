@@ -118,4 +118,24 @@ describe('all routes', () => {
 
     expect(response.body).toEqual({});
   });
+
+  it('returns an updated movie after update', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovieId = moviesList[0].id;
+    const updatedMovie = {
+      title: 'Step Brothers II',
+      year: 2021,
+      director: 'Michael Bay',
+      genre: 'Lens Flare and explosions',
+      thumbs: false
+    };
+    const response = await request(app)
+      .put(`/api/movies/${savedMovieId}`)
+      .send(updatedMovie);
+
+    expect(response.body).toEqual({
+      ...updatedMovie,
+      id:savedMovieId
+    });
+  });
 });
