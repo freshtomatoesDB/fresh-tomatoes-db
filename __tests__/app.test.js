@@ -138,4 +138,18 @@ describe('all routes', () => {
       id:savedMovieId
     });
   });
+  it('deletes movie and returns the deleted movie', async() => {
+    const newMovie = await Movie.insertMovie({
+      title: 'Bee Movie III: Armageddon',
+      year: 2020,
+      director: 'Quentin Tarantino',
+      genre: 'Spaghetti Ninja Western',
+      thumbs: true
+    });
+    
+    const response = await request(app)
+      .delete(`/api/movies/${newMovie.id}`);
+
+    expect(response.body).toEqual(newMovie);
+  });
 });
