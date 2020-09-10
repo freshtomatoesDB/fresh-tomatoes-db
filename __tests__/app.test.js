@@ -118,4 +118,58 @@ describe('all routes', () => {
 
     expect(response.body).toEqual({});
   });
+
+  it('gets a movie by id with the actors', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovie = moviesList[0];
+    
+
+    const response = await request(app)
+      .get(`/api/movieswithactors/${savedMovie.id}`);
+
+    expect(response.body).toEqual(
+      {
+        ...savedMovie,
+        actors: expect.arrayContaining([
+          { id: expect.any(Number), movieId: Number(savedMovie.id), name: 'Will Ferrell', oscar: true },
+          { id: expect.any(Number), movieId: Number(savedMovie.id), name: 'John C Reilly', oscar: true }
+        ])
+      }
+    );
+  });
+
+
+  it('returns an updated movie after update', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovieId = moviesList[0].id;
+    const updatedMovie = {
+      title: 'Step Brothers II',
+      year: 2021,
+      director: 'Michael Bay',
+      genre: 'Lens Flare and explosions',
+      thumbs: false
+    };
+    const response = await request(app)
+      .put(`/api/movies/${savedMovieId}`)
+      .send(updatedMovie);
+
+    expect(response.body).toEqual({
+      ...updatedMovie,
+      id:savedMovieId
+    });
+  });
+  it('deletes movie and returns the deleted movie', async() => {
+    const newMovie = await Movie.insertMovie({
+      title: 'Bee Movie III: Armageddon',
+      year: 2020,
+      director: 'Quentin Tarantino',
+      genre: 'Spaghetti Ninja Western',
+      thumbs: true
+    });
+    
+    const response = await request(app)
+      .delete(`/api/movies/${newMovie.id}`);
+
+    expect(response.body).toEqual(newMovie);
+  });
 });
