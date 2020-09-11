@@ -218,4 +218,18 @@ describe('all routes', () => {
       },
     ]));
   });
+
+  it('gets an actor by id', async() => {
+    const actorsList = await Actor.findAllActors();
+    const savedActor = actorsList[0];
+    
+    const response = await request(app)
+      .get(`/api/actors/${savedActor.id}`);
+
+    expect(response.body).toEqual(
+      {
+        ...savedActor
+      }
+    );
+  });
 });
