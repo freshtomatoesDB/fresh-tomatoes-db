@@ -192,4 +192,30 @@ describe('all routes', () => {
       ...newActor
     });
   });
+
+  it('gets all actors on GET', async() => {
+    const response = await request(app)
+      .get('/api/actors');
+
+    expect(response.body).toEqual(expect.arrayContaining([
+      {
+        id: expect.any(String),
+        movieId: expect.any(String),
+        name: 'Will Ferrell',
+        oscar: true
+      },
+      {
+        id: expect.any(String),
+        movieId: expect.any(String),
+        name: 'John C Reilly',
+        oscar: true
+      },
+      {
+        id: expect.any(String),
+        movieId: expect.any(String),
+        name: 'Jerry Seinfeld',
+        oscar: false
+      },
+    ]));
+  });
 });
