@@ -4,6 +4,7 @@ const request = require('supertest');
 const app = require('../lib/app');
 const Movie = require('../lib/models/movie');
 const Actor = require('../lib/models/actor');
+const { findActorById } = require('../lib/models/actor');
 
 describe('all routes', () => {
 
@@ -158,6 +159,7 @@ describe('all routes', () => {
       id:savedMovieId
     });
   });
+
   it('deletes movie and returns the deleted movie', async() => {
     const newMovie = await Movie.insertMovie({
       title: 'Bee Movie III: Armageddon',
@@ -226,10 +228,50 @@ describe('all routes', () => {
     const response = await request(app)
       .get(`/api/actors/${savedActor.id}`);
 
-    expect(response.body).toEqual(
-      {
-        ...savedActor
-      }
-    );
+    expect(response.body).toEqual(savedActor);
   });
+
+  it('gets all actors in movie', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovie = moviesList[0];
+
+    const response = await request(app)
+      .get(`/api/actorsinmovie/${savedMovie.id}`);
+
+      expect(response.body).toEqual(
+          expect.arrayContaining([
+            { id: expect.any(String), movieId: savedMovie.id, name: 'Will Ferrell', oscar: true },
+            { id: expect.any(String), movieId: savedMovie.id, name: 'John C Reilly', oscar: true }
+          ])
+
+      );
+  });
+
+  it('returns an updated actor after update', async() => {
+    const actorsList = await Actor.findAllActors();
+    const savedActor = actorsList[0];
+    const updatedActor = {
+      movieId: savedActor.movieId,
+      name: 'Will Ferrell Jr',
+      oscar: false
+    };
+    const response = await request(app)
+      .put(`/api/actors/${savedActor.id}`)
+      .send(updatedActor);
+
+    expect(response.body).toEqual({
+      ...updatedActor,
+      id:savedActor.id
+    });
+  });
+
+  it('deletes an actor by id', async() => {
+    const savedActor = await Actor.findActorById(1);
+
+    const response = await request(app)
+      .delete(`/api/actors/${savedActor.id}`);
+
+    expect(response.body).toEqual(savedActor);
+  })
+
 });
