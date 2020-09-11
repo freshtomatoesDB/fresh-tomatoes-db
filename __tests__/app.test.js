@@ -172,4 +172,64 @@ describe('all routes', () => {
 
     expect(response.body).toEqual(newMovie);
   });
+
+  it('makes a new actor on POST', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovieId = moviesList[0].id;
+
+    const newActor = {
+      movieId: savedMovieId,
+      name: 'Adam Scott',
+      oscar: false
+    };
+
+    const response = await request(app)
+      .post('/api/actors')
+      .send(newActor);
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      ...newActor
+    });
+  });
+
+  it('gets all actors on GET', async() => {
+    const response = await request(app)
+      .get('/api/actors');
+
+    expect(response.body).toEqual(expect.arrayContaining([
+      {
+        id: expect.any(String),
+        movieId: expect.any(String),
+        name: 'Will Ferrell',
+        oscar: true
+      },
+      {
+        id: expect.any(String),
+        movieId: expect.any(String),
+        name: 'John C Reilly',
+        oscar: true
+      },
+      {
+        id: expect.any(String),
+        movieId: expect.any(String),
+        name: 'Jerry Seinfeld',
+        oscar: false
+      },
+    ]));
+  });
+
+  it('gets an actor by id', async() => {
+    const actorsList = await Actor.findAllActors();
+    const savedActor = actorsList[0];
+    
+    const response = await request(app)
+      .get(`/api/actors/${savedActor.id}`);
+
+    expect(response.body).toEqual(
+      {
+        ...savedActor
+      }
+    );
+  });
 });
