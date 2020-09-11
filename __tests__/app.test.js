@@ -172,4 +172,24 @@ describe('all routes', () => {
 
     expect(response.body).toEqual(newMovie);
   });
+
+  it('makes a new actor on POST', async() => {
+    const moviesList = await Movie.findAllMovies();
+    const savedMovieId = moviesList[0].id;
+
+    const newActor = {
+      movieId: savedMovieId,
+      name: 'Adam Scott',
+      oscar: false
+    };
+
+    const response = await request(app)
+      .post('/api/actors')
+      .send(newActor);
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      ...newActor
+    });
+  });
 });
